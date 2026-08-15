@@ -1,7 +1,7 @@
 package com.telco.backend.security.user;
 
-import com.telco.backend.model.Role;
-import com.telco.backend.model.User;
+import com.telco.backend.domain.Role;
+import com.telco.backend.domain.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,9 +24,9 @@ public class CustomUserDetails implements UserDetails {
         this.id = user.getId();
         this.username = user.getUsername();
         this.passwordHash = user.getPasswordHash();
-        this.role = user.getRol();
+        this.role = user.getRole();
         this.activo = Boolean.TRUE.equals(user.getActivo());
-        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRol().name()));
+        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override

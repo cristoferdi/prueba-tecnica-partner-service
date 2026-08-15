@@ -1,6 +1,6 @@
 package com.telco.backend.security.user;
 
-import com.telco.backend.model.User;
+import com.telco.backend.domain.User;
 import com.telco.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

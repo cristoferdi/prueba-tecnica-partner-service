@@ -1,9 +1,9 @@
 package com.telco.backend;
 
-import com.telco.backend.model.Role;
-import com.telco.backend.model.Sale;
-import com.telco.backend.model.SaleStatus;
-import com.telco.backend.model.User;
+import com.telco.backend.domain.Role;
+import com.telco.backend.domain.Sale;
+import com.telco.backend.domain.SaleStatus;
+import com.telco.backend.domain.User;
 import com.telco.backend.repository.SaleRepository;
 import com.telco.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -39,7 +39,7 @@ class PersistenceIntegrationTest {
     void shouldFindSupervisorCorrectly() {
         User supervisor = userRepository.findById(1L).orElseThrow();
         assertThat(supervisor.getUsername()).isEqualTo("supervisor1");
-        assertThat(supervisor.getRol()).isEqualTo(Role.SUPERVISOR);
+        assertThat(supervisor.getRole()).isEqualTo(Role.SUPERVISOR);
         assertThat(supervisor.getSupervisor()).isNull();
     }
 
@@ -47,7 +47,7 @@ class PersistenceIntegrationTest {
     void shouldFindAgenteWithSupervisor() {
         User agente = userRepository.findById(4L).orElseThrow();
         assertThat(agente.getUsername()).isEqualTo("agente1");
-        assertThat(agente.getRol()).isEqualTo(Role.AGENTE);
+        assertThat(agente.getRole()).isEqualTo(Role.AGENTE);
         assertThat(agente.getSupervisor()).isNotNull();
         assertThat(agente.getSupervisor().getUsername()).isEqualTo("supervisor1");
     }
@@ -143,7 +143,7 @@ class PersistenceIntegrationTest {
         User newUser = new User();
         newUser.setUsername("test_agente");
         newUser.setPasswordHash("$2b$10$testHashPlaceholderForJpaWriteTest12345678");
-        newUser.setRol(Role.AGENTE);
+        newUser.setRole(Role.AGENTE);
         newUser.setSupervisor(supervisor);
         newUser.setActivo(true);
 
@@ -156,6 +156,6 @@ class PersistenceIntegrationTest {
 
         User savedUser = userRepository.findById(newUser.getId()).orElseThrow();
         assertThat(savedUser.getUsername()).isEqualTo("test_agente");
-        assertThat(savedUser.getRol()).isEqualTo(Role.AGENTE);
+        assertThat(savedUser.getRole()).isEqualTo(Role.AGENTE);
     }
 }

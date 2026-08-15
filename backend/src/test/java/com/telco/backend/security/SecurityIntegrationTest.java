@@ -1,6 +1,6 @@
 package com.telco.backend.security;
 
-import com.telco.backend.auth.dto.LoginRequest;
+import com.telco.backend.web.dto.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

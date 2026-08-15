@@ -1,6 +1,6 @@
 package com.telco.backend.repository;
 
-import com.telco.backend.model.Sale;
+import com.telco.backend.domain.Sale;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

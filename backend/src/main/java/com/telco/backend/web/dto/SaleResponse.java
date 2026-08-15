@@ -29,6 +29,6 @@ public class SaleResponse {
     private Instant fechaValidacion;
     private Long agenteId;
     private String agenteUsername;
-    private String createdAt;
-    private String updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

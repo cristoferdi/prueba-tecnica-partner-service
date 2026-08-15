@@ -12,6 +12,12 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+/**
+ * Generación y validación de tokens JWT.
+ * <p>
+ * El claim {@code role} incluido en el token es solo informativo: la autorización
+ * SIEMPRE se resuelve desde la BD vía {@code CustomUserDetails}, nunca desde el token.
+ */
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -50,15 +56,6 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
         return claims.getSubject();
-    }
-
-    public String getRoleFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-        return claims.get("role", String.class);
     }
 
     public Claims getClaims(String token) {

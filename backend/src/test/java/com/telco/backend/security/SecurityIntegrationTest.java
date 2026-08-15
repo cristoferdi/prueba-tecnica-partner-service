@@ -378,6 +378,35 @@ class SecurityIntegrationTest {
         result.andExpect(status().isForbidden());
     }
 
+    // =========================================================================
+    // Test: JSON de error uniforme desde el entrypoint (401 sin token)
+    // =========================================================================
+    @Test
+    void test_errorJsonUniforme_desdeEntryPoint() throws Exception {
+        mockMvc.perform(get("/api/v1/ventas/mis-ventas"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.path").value("/api/v1/ventas/mis-ventas"))
+                .andExpect(jsonPath("$.error").value("Unauthorized"))
+                .andExpect(jsonPath("$.message").value("Authentication failed"));
+    }
+
+    // =========================================================================
+    // Test: JSON de error uniforme desde el denied handler (403)
+    // =========================================================================
+    @Test
+    void test_errorJsonUniforme_desdeDeniedHandler() throws Exception {
+        String token = generateToken("agente1", "AGENTE");
+
+        mockMvc.perform(get("/api/v1/reportes/resumen")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.path").value("/api/v1/reportes/resumen"))
+                .andExpect(jsonPath("$.error").value("Forbidden"))
+                .andExpect(jsonPath("$.message").value("Access denied"));
+    }
+
     private String generateTokenWithRole(String username, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);

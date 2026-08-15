@@ -47,8 +47,8 @@ class JwtServiceTest {
     @Test
     void test_roleClaim() {
         String token = jwtService.generateToken("agente1", "AGENTE");
-        String role = jwtService.getRoleFromToken(token);
-        assertThat(role).isEqualTo("AGENTE");
+        Claims claims = jwtService.getClaims(token);
+        assertThat(claims.get("role", String.class)).isEqualTo("AGENTE");
     }
 
     @Test

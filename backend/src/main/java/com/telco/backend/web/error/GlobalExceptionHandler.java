@@ -4,6 +4,7 @@ import com.telco.backend.domain.exception.DuplicateCallCodeException;
 import com.telco.backend.domain.exception.SaleNotFoundException;
 import com.telco.backend.domain.exception.SaleNotPendingException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -12,12 +13,16 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -46,11 +51,31 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
     public ResponseEntity<ApiError> handleValidationException(Exception ex, HttpServletRequest request) {
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        if (ex instanceof MethodArgumentNotValidException methodEx) {
+            fieldErrors.putAll(methodEx.getBindingResult().getFieldErrors().stream()
+                    .collect(Collectors.toMap(
+                            FieldError::getField,
+                            DefaultMessageSourceResolvable::getDefaultMessage,
+                            (existing, replacement) -> existing,
+                            LinkedHashMap::new
+                    )));
+        } else if (ex instanceof BindException bindEx) {
+            fieldErrors.putAll(bindEx.getBindingResult().getFieldErrors().stream()
+                    .collect(Collectors.toMap(
+                            FieldError::getField,
+                            DefaultMessageSourceResolvable::getDefaultMessage,
+                            (existing, replacement) -> existing,
+                            LinkedHashMap::new
+                    )));
+        }
+
         ApiError error = ApiError.builder()
                 .timestamp(Instant.now())
                 .path(request.getRequestURI())
                 .error("Bad Request")
                 .message("Validation failed")
+                .fieldErrors(fieldErrors)
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }

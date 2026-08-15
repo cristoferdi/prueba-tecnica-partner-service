@@ -5,7 +5,6 @@ import com.telco.backend.domain.SaleStatus;
 import com.telco.backend.domain.User;
 import com.telco.backend.domain.exception.DuplicateCallCodeException;
 import com.telco.backend.domain.exception.SaleNotFoundException;
-import com.telco.backend.domain.exception.SaleNotPendingException;
 import com.telco.backend.repository.SaleRepository;
 import com.telco.backend.repository.UserRepository;
 import com.telco.backend.repository.specification.SaleSpecs;
@@ -41,19 +40,18 @@ public class SaleService {
 
         User agente = getCurrentAuthenticatedUser();
 
-        Sale sale = new Sale();
-        sale.setAgente(agente);
-        sale.setDniCliente(request.getDniCliente());
-        sale.setNombreCliente(request.getNombreCliente());
-        sale.setTelefonoCliente(request.getTelefonoCliente());
-        sale.setDireccionCliente(request.getDireccionCliente());
-        sale.setPlanActual(request.getPlanActual());
-        sale.setPlanNuevo(request.getPlanNuevo());
-        sale.setCodigoLlamada(request.getCodigoLlamada());
-        sale.setProducto(request.getProducto());
-        sale.setMonto(request.getMonto());
-        sale.setEstado(SaleStatus.PENDIENTE);
-        sale.setFechaRegistro(Instant.now());
+        Sale sale = Sale.newPending(
+                agente,
+                request.getDniCliente(),
+                request.getNombreCliente(),
+                request.getTelefonoCliente(),
+                request.getDireccionCliente(),
+                request.getPlanActual(),
+                request.getPlanNuevo(),
+                request.getCodigoLlamada(),
+                request.getProducto(),
+                request.getMonto()
+        );
 
         Sale savedSale = saleRepository.save(sale);
 
@@ -112,12 +110,7 @@ public class SaleService {
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException(id));
 
-        if (sale.getEstado() != SaleStatus.PENDIENTE) {
-            throw new SaleNotPendingException(id, sale.getEstado().name());
-        }
-
-        sale.setEstado(SaleStatus.APROBADA);
-        sale.setFechaValidacion(Instant.now());
+        sale.approve();
 
         Sale savedSale = saleRepository.save(sale);
         return toResponse(savedSale);
@@ -127,13 +120,7 @@ public class SaleService {
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException(id));
 
-        if (sale.getEstado() != SaleStatus.PENDIENTE) {
-            throw new SaleNotPendingException(id, sale.getEstado().name());
-        }
-
-        sale.setEstado(SaleStatus.RECHAZADA);
-        sale.setMotivoRechazo(motivo);
-        sale.setFechaValidacion(Instant.now());
+        sale.reject(motivo);
 
         Sale savedSale = saleRepository.save(sale);
         return toResponse(savedSale);

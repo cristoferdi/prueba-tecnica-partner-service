@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
-import java.util.List;
 
 @Getter
 @Setter
@@ -45,10 +44,4 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
-
-    @OneToMany(mappedBy = "supervisor", fetch = FetchType.LAZY)
-    private List<User> supervisedAgents;
-
-    @OneToMany(mappedBy = "agente", fetch = FetchType.LAZY)
-    private List<Sale> sales;
 }

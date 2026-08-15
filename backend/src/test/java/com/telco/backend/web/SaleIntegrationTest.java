@@ -1,6 +1,7 @@
 package com.telco.backend.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.telco.backend.support.AbstractPostgresContainerTest;
 import com.telco.backend.web.dto.RejectSaleRequest;
 import com.telco.backend.web.dto.SaleRequest;
 import io.jsonwebtoken.Jwts;
@@ -13,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,10 +31,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 @Transactional
 @Rollback
-class SaleIntegrationTest {
+class SaleIntegrationTest extends AbstractPostgresContainerTest {
 
     @Autowired
     private MockMvc mockMvc;

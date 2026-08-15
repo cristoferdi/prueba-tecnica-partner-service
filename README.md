@@ -11,7 +11,7 @@ ventas descrito en [`prueba-tecnica.md`](prueba-tecnica.md):
 
 ```
 proyecto/
-├── backend/    Spring Boot 3 (Java 21), PostgreSQL (H2 en tests), JWT, OpenAPI
+├── backend/    Spring Boot 3 (Java 21), PostgreSQL (Testcontainers en tests), JWT, OpenAPI
 ├── frontend/   React + Vite (consumidor de la API)
 ├── docs/       Documentación
 ├── schema.sql + data.sql  → ver backend/src/main/resources/ (entregables de BD)
@@ -94,8 +94,11 @@ La API queda en **`http://localhost:8080/api/v1`**.
 
 ```bash
 cd backend
-./mvnw clean test        # usa H2 en memoria (perfil test), no requiere PostgreSQL
+./mvnw clean test        # usa PostgreSQL real en Docker (Testcontainers) para los tests de integración
 ```
+
+> **Requisito:** Docker Desktop debe estar corriendo. Los tests de integración levantan un
+> contenedor `postgres:16-alpine` automáticamente (no requiere una BD local configurada).
 
 ---
 

@@ -1,12 +1,11 @@
 package com.telco.backend;
 
+import com.telco.backend.support.AbstractPostgresContainerTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles("test")
-class BackendApplicationTests {
+class BackendApplicationTests extends AbstractPostgresContainerTest {
 
 	@Test
 	void contextLoads() {

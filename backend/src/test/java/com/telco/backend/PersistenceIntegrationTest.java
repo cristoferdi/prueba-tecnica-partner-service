@@ -6,11 +6,11 @@ import com.telco.backend.domain.SaleStatus;
 import com.telco.backend.domain.User;
 import com.telco.backend.repository.SaleRepository;
 import com.telco.backend.repository.UserRepository;
+import com.telco.backend.support.AbstractPostgresContainerTest;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -20,8 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-@ActiveProfiles("test")
-class PersistenceIntegrationTest {
+class PersistenceIntegrationTest extends AbstractPostgresContainerTest {
 
     @Autowired
     private UserRepository userRepository;

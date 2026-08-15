@@ -1,5 +1,6 @@
 package com.telco.backend.security;
 
+import com.telco.backend.support.AbstractPostgresContainerTest;
 import com.telco.backend.web.dto.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -27,12 +28,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.springframework.test.context.ActiveProfiles;
-
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-class SecurityIntegrationTest {
+class SecurityIntegrationTest extends AbstractPostgresContainerTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -1,0 +1,43 @@
+# =========================
+# Entorno y Secretos
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Backend (Spring Boot / Maven)
+# =========================
+backend/target/
+backend/*.log
+
+# Maven wrapper
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# =========================
+# Frontend (Vite / React / Node)
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/.eslintcache
+
+# =========================
+# IDEs y Sistema Operativo
+# =========================
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# =========================
+# Otros
+# =========================
+prueba-tecnica.md
+plan.md

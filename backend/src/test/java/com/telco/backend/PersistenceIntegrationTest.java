@@ -32,7 +32,7 @@ class PersistenceIntegrationTest {
     @Test
     void shouldFindAllSeedUsers() {
         List<User> users = userRepository.findAll();
-        assertThat(users).hasSize(6);
+        assertThat(users).hasSize(8);
     }
 
     @Test
@@ -55,7 +55,7 @@ class PersistenceIntegrationTest {
     @Test
     void shouldFindAllSeedSales() {
         List<Sale> sales = saleRepository.findAll();
-        assertThat(sales).hasSize(9);
+        assertThat(sales).hasSize(10);
     }
 
     @Test
@@ -86,7 +86,8 @@ class PersistenceIntegrationTest {
         List<Sale> sales = saleRepository.findAll();
         long agente1Sales = sales.stream().filter(s -> s.getAgente().getId() == 4L).count();
         long agente2Sales = sales.stream().filter(s -> s.getAgente().getId() == 5L).count();
-        assertThat(agente1Sales + agente2Sales).isEqualTo(9);
+        long agente3Sales = sales.stream().filter(s -> s.getAgente().getId() == 8L).count();
+        assertThat(agente1Sales + agente2Sales + agente3Sales).isEqualTo(10);
     }
 
     // --- Write tests: verify JPA INSERT via @Enumerated(EnumType.STRING) -> VARCHAR ---

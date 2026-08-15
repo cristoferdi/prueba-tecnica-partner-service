@@ -792,4 +792,35 @@ class SaleIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
+
+    // =========================================================================
+    // Test 51 (REGRESIÓN): SUPERVISOR NO ve ventas de agentes de OTRO supervisor
+    // supervisor1 (id=1) solo supervisa agente1 (id=4) y agente2 (id=5).
+    // agente3 (id=8) pertenece a supervisor2 (id=7) -> lista vacía
+    // =========================================================================
+    @Test
+    void test_equipo_noVeAgenteDeOtroSupervisor() throws Exception {
+        String token = generateToken("supervisor1", "SUPERVISOR");
+
+        mockMvc.perform(get("/api/v1/ventas/equipo")
+                .header("Authorization", "Bearer " + token)
+                .param("agenteId", "8"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    // =========================================================================
+    // Test 52 (REGRESIÓN): supervisor2 ve solo las ventas de SU equipo
+    // supervisor2 (id=7) supervisa agente3 (id=8) con la venta 10 -> 1 venta
+    // =========================================================================
+    @Test
+    void test_equipo_supervisor2_soloSuEquipo() throws Exception {
+        String token = generateToken("supervisor2", "SUPERVISOR");
+
+        mockMvc.perform(get("/api/v1/ventas/equipo")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].agenteUsername").value("agente3"));
+    }
 }

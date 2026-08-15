@@ -14,6 +14,7 @@ import com.telco.backend.web.dto.SalePageResponse;
 import com.telco.backend.web.dto.SaleRequest;
 import com.telco.backend.web.dto.SaleResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -53,7 +54,12 @@ public class SaleService {
                 request.getMonto()
         );
 
-        Sale savedSale = saleRepository.save(sale);
+        Sale savedSale;
+        try {
+            savedSale = saleRepository.save(sale);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateCallCodeException(request.getCodigoLlamada());
+        }
 
         return toResponse(savedSale);
     }

@@ -1,6 +1,5 @@
 package com.telco.backend.web;
 
-import com.telco.backend.domain.SaleStatus;
 import com.telco.backend.service.SaleService;
 import com.telco.backend.web.dto.RejectSaleRequest;
 import com.telco.backend.web.dto.SaleFilter;
@@ -23,6 +22,7 @@ import java.util.List;
 public class SaleController {
 
     private final SaleService saleService;
+    private final SaleStatusParamParser saleStatusParamParser;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -38,13 +38,7 @@ public class SaleController {
             Pageable pageable) {
 
         SaleFilter filter = new SaleFilter();
-        if (estado != null && !estado.isEmpty()) {
-            try {
-                filter.setEstado(SaleStatus.valueOf(estado));
-            } catch (IllegalArgumentException e) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estado inválido: " + estado);
-            }
-        }
+        filter.setEstado(saleStatusParamParser.parse(estado));
         filter.setDesde(desde);
         filter.setHasta(hasta);
 
@@ -73,15 +67,6 @@ public class SaleController {
             @RequestParam(required = false) Instant desde,
             @RequestParam(required = false) Instant hasta) {
 
-        SaleStatus estadoEnum = null;
-        if (estado != null && !estado.isEmpty()) {
-            try {
-                estadoEnum = SaleStatus.valueOf(estado);
-            } catch (IllegalArgumentException e) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estado inválido: " + estado);
-            }
-        }
-
-        return saleService.getEquipoVentas(estadoEnum, agenteId, desde, hasta);
+        return saleService.getEquipoVentas(saleStatusParamParser.parse(estado), agenteId, desde, hasta);
     }
 }

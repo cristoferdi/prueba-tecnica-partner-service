@@ -158,4 +158,14 @@ Errores JSON consistentes: `{ timestamp, path, error, message }`.
 
 - Swagger UI del backend: `http://localhost:8080/swagger-ui.html`
 - OpenAPI JSON: `http://localhost:8080/v3/api-docs`
-- La documentación del contrato se consolida en `docs/` (ver Fase 8 del plan de refactorización)
+- OpenAPI exportado: [`docs/openapi.yaml`](docs/openapi.yaml)
+- Contrato para el frontend: [`docs/frontend/api-documentation.md`](docs/frontend/api-documentation.md)
+- Plan de refactorización: [`plan.md`](plan.md)
+
+> Para regenerar `docs/openapi.yaml` después de cambiar los controllers:
+>
+> ```bash
+> cd backend
+> mvn test -Dtest=OpenApiDumpTest -Djunit.jupiter.conditions.deactivate=org.junit.*DisabledCondition
+> # el JSON queda en backend/target/openapi.json; convertir a YAML con el script de docs/ si existe
+> ```

@@ -126,6 +126,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGenericException(Exception ex, HttpServletRequest request) {
+        org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class).error("Unhandled exception", ex);
         ApiError error = ApiError.builder()
                 .timestamp(Instant.now())
                 .path(request.getRequestURI())

@@ -1,5 +1,6 @@
 package com.telco.backend.web.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +13,18 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
+@Schema(description = "Solicitud de creación de venta (AGENTE)", example = """
+        {
+          "dniCliente": "12345678",
+          "nombreCliente": "Juan Pérez Ríos",
+          "telefonoCliente": "987654321",
+          "direccionCliente": "Av. Larco 123, Lima",
+          "planActual": "Plan Básico",
+          "planNuevo": "Plan Premium",
+          "codigoLlamada": "CALL-20250115-0001",
+          "producto": "Internet",
+          "monto": 5000.00
+        }""")
 public class SaleRequest {
 
     @NotBlank(message = "DNI cliente es requerido")

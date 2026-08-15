@@ -1,0 +1,577 @@
+openapi: 3.1.0
+info:
+  title: Telco Backend API
+  description: 'API del flujo de ventas Telco Fija Hogar.
+
+
+    Autenticación: usa el endpoint `/api/v1/auth/login` para obtener un JWT
+
+    y luego envía `Authorization: Bearer <token>`. El rol/autoridad se
+
+    resuelve desde la base de datos, no desde el token.
+
+    '
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Servidor local
+security:
+- bearerAuth: []
+tags:
+- name: Auth
+  description: Autenticación y emisión de tokens JWT
+- name: Ventas
+  description: 'Gestión de ventas: creación, consulta, aprobación y rechazo'
+- name: Reportes
+  description: Resumen de ventas del equipo para supervisores
+paths:
+  /api/v1/ventas:
+    post:
+      tags:
+      - Ventas
+      summary: Crear venta
+      description: Registra una venta nueva en estado PENDIENTE. Solo AGENTE.
+      operationId: createSale
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleRequest'
+        required: true
+      responses:
+        '201':
+          description: Venta creada
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SaleResponse'
+        '400':
+          description: Validación fallida
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Solo agentes
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: codigo_llamada duplicado
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/ventas/{id}/rechazar:
+    post:
+      tags:
+      - Ventas
+      summary: Rechazar venta
+      description: Rechaza una venta PENDIENTE con motivo y fija fecha_validacion.
+        Solo BACKOFFICE.
+      operationId: rejectSale
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectSaleRequest'
+        required: true
+      responses:
+        '200':
+          description: Venta rechazada
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SaleResponse'
+        '400':
+          description: Motivo requerido o la venta no está PENDIENTE
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Solo backoffice
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Venta no encontrada
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/ventas/{id}/aprobar:
+    post:
+      tags:
+      - Ventas
+      summary: Aprobar venta
+      description: Aprueba una venta PENDIENTE y fija fecha_validacion. Solo BACKOFFICE.
+      operationId: approveSale
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Venta aprobada
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SaleResponse'
+        '400':
+          description: La venta no está PENDIENTE
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Solo backoffice
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Venta no encontrada
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Iniciar sesión
+      description: Valida credenciales y devuelve un JWT junto con el rol del usuario.
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Login correcto
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              examples:
+                login-exitoso:
+                  description: login-exitoso
+                  value:
+                    token: <jwt>
+                    role: AGENTE
+        '400':
+          description: Validación fallida
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: Credenciales inválidas o usuario inactivo
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/ventas/pendientes:
+    get:
+      tags:
+      - Ventas
+      summary: Ventas pendientes
+      description: Lista todas las ventas PENDIENTES. Solo BACKOFFICE.
+      operationId: getPendingSales
+      responses:
+        '200':
+          description: Lista de ventas pendientes
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SaleResponse'
+        '403':
+          description: Solo backoffice
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/ventas/mis-ventas:
+    get:
+      tags:
+      - Ventas
+      summary: Mis ventas
+      description: Lista las ventas del agente autenticado. Filtros y paginación.
+        Solo AGENTE.
+      operationId: getMisVentas
+      parameters:
+      - name: estado
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: desde
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: hasta
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        '200':
+          description: Página de ventas
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SalePageResponse'
+        '400':
+          description: Estado inválido
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Solo agentes
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/ventas/equipo:
+    get:
+      tags:
+      - Ventas
+      summary: Ventas del equipo
+      description: Ventas de los agentes bajo la supervisión del usuario autenticado.
+        Solo SUPERVISOR.
+      operationId: getEquipoVentas
+      parameters:
+      - name: estado
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: agenteId
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: desde
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: hasta
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Lista de ventas del equipo
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SaleResponse'
+        '400':
+          description: Estado inválido
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Solo supervisores
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/reportes/resumen:
+    get:
+      tags:
+      - Reportes
+      summary: Resumen de ventas
+      description: 'Resumen de las ventas del equipo del supervisor autenticado:
+
+        conteos por estado, monto total aprobadas y serie de ventas por día.
+
+        Opcionalmente se filtra por rango [desde, hasta]. Solo SUPERVISOR.'
+      operationId: getResumen
+      parameters:
+      - name: desde
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: hasta
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Resumen
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+        '403':
+          description: Solo supervisores
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  schemas:
+    SaleRequest:
+      type: object
+      description: Solicitud de creación de venta (AGENTE)
+      example:
+        dniCliente: '12345678'
+        nombreCliente: Juan Pérez Ríos
+        telefonoCliente: '987654321'
+        direccionCliente: Av. Larco 123, Lima
+        planActual: Plan Básico
+        planNuevo: Plan Premium
+        codigoLlamada: CALL-20250115-0001
+        producto: Internet
+        monto: 5000.0
+      properties:
+        dniCliente:
+          type: string
+          minLength: 1
+          pattern: \d{8}|\d{11}
+        nombreCliente:
+          type: string
+          maxLength: 100
+          minLength: 0
+        telefonoCliente:
+          type: string
+          minLength: 1
+          pattern: \d{9}
+        direccionCliente:
+          type: string
+          maxLength: 200
+          minLength: 0
+        planActual:
+          type: string
+          maxLength: 50
+          minLength: 0
+        planNuevo:
+          type: string
+          maxLength: 50
+          minLength: 0
+        codigoLlamada:
+          type: string
+          maxLength: 50
+          minLength: 0
+        producto:
+          type: string
+          maxLength: 100
+          minLength: 0
+        monto:
+          type: number
+          minimum: 0.01
+      required:
+      - monto
+    SaleResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        dniCliente:
+          type: string
+        nombreCliente:
+          type: string
+        telefonoCliente:
+          type: string
+        direccionCliente:
+          type: string
+        planActual:
+          type: string
+        planNuevo:
+          type: string
+        codigoLlamada:
+          type: string
+        producto:
+          type: string
+        monto:
+          type: number
+        estado:
+          type: string
+          enum:
+          - PENDIENTE
+          - APROBADA
+          - RECHAZADA
+        motivoRechazo:
+          type: string
+        fechaRegistro:
+          type: string
+          format: date-time
+        fechaValidacion:
+          type: string
+          format: date-time
+        agenteId:
+          type: integer
+          format: int64
+        agenteUsername:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ApiError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+        error:
+          type: string
+        message:
+          type: string
+        fieldErrors:
+          type: object
+          additionalProperties:
+            type: string
+    RejectSaleRequest:
+      type: object
+      description: Motivo de rechazo de venta (BACKOFFICE)
+      example:
+        motivo: Datos incompletos del cliente
+      properties:
+        motivo:
+          type: string
+          minLength: 1
+    LoginRequest:
+      type: object
+      description: Credenciales de acceso
+      example:
+        username: agente1
+        password: Agente*123
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        role:
+          type: string
+          enum:
+          - ADMIN
+          - AGENTE
+          - BACKOFFICE
+          - SUPERVISOR
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+    SalePageResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/SaleResponse'
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        first:
+          type: boolean
+    ReportResponse:
+      type: object
+      properties:
+        conteosPorEstado:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusCount'
+        montoTotalAprobadas:
+          type: number
+        ventasPorDia:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesPerDay'
+    SalesPerDay:
+      type: object
+      properties:
+        fecha:
+          type: string
+        count:
+          type: integer
+          format: int64
+        monto:
+          type: number
+    StatusCount:
+      type: object
+      properties:
+        estado:
+          type: string
+          enum:
+          - PENDIENTE
+          - APROBADA
+          - RECHAZADA
+        count:
+          type: integer
+          format: int64
+  securitySchemes:
+    bearerAuth:
+      type: http
+      name: bearerAuth
+      scheme: bearer
+      bearerFormat: JWT

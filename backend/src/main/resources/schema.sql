@@ -1,8 +1,11 @@
 -- =============================================================================
 -- Telco Backend - Database Schema
 -- =============================================================================
--- DROP statements for clean restart in development.
--- In production, use a proper migration tool (Flyway / Liquibase).
+-- ENTREGABLE REQUERIDO por prueba-tecnica.md.
+-- Se ejecuta automáticamente al arrancar (spring.sql.init.mode=always).
+--
+-- ADVERTENCIA (dev-only): los DROP TABLE fuerzan un reinicio limpio de la BD en
+-- cada arranque. Solo es un mecanismo de seed/desarrollo exigido por el enunciado.
 -- =============================================================================
 
 DROP TABLE IF EXISTS venta;

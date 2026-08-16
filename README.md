@@ -4,36 +4,37 @@ Solución Fullstack (Spring Boot 3 + React) para la gestión del flujo de ventas
 
 ---
 
-## ⚙️ 1. Levantar la Base de Datos (DB Incluida)
+## ⚙️ 1. Configuración Centralizada (.env)
 
-El proyecto incluye *seeding* automático (`schema.sql` y `data.sql`). Tienes dos opciones para levantar PostgreSQL en el puerto `5432`:
+El proyecto utiliza una configuración centralizada en la raíz para facilitar el despliegue. 
+
+Crea tu archivo de variables de entorno copiando el ejemplo proporcionado en la **raíz del proyecto**:
+
+```bash
+# En Windows/Linux (desde la raíz del proyecto):
+cp .env.example .env
+```
+> **Nota:** Los valores por defecto en el `.env` ya están configurados para funcionar "out-of-the-box" (PostgreSQL apuntando al puerto 5433, JWT y URL del frontend).
+
+---
+
+## 🗄️ 2. Levantar la Base de Datos (DB Incluida)
+
+El proyecto incluye *seeding* automático (`schema.sql` y `data.sql`). Tienes dos opciones para levantar PostgreSQL:
 
 **Opción A: Vía Docker (Recomendada - Fricción Cero)**
+Desde la raíz del proyecto, ejecuta:
 ```bash
 docker compose up -d
 ```
-*(Levanta el motor con las credenciales por defecto `postgres / postgres`).*
+*(Docker leerá automáticamente tu archivo `.env` en la raíz para levantar el motor con el puerto y credenciales correctas).*
 
 **Opción B: Instalación Local**
-Si no usas Docker, simplemente crea una base de datos local vacía llamada `telco_db` y asegúrate de que tus credenciales coincidan con el archivo `.env`.
+Si no usas Docker, crea una base de datos local vacía llamada `telco_db` y asegúrate de que tus credenciales y puerto coincidan con tu archivo `.env`.
 
 ---
 
-## 🔐 2. Variables de Entorno
-
-Tanto en la carpeta `backend/` como en `frontend/` existe un archivo `.env.example`.
-Renómbralos a `.env` antes de ejecutar el proyecto:
-
-```bash
-# En Windows/Linux:
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-```
-> **Nota:** Los valores por defecto en los `.env.example` ya están configurados para funcionar "out-of-the-box" con la base de datos de Docker y los puertos por defecto.
-
----
-
-## 🚀 3. Ejecutar el Proyecto (Windows / Linux)
+## 🚀 3. Ejecutar el Proyecto
 
 ### Backend (API en puerto 8080)
 Requiere Java 21. Al arrancar, poblará la base de datos automáticamente.
